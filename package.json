@@ -1,0 +1,39 @@
+{
+	"type": "module",
+	"scripts": {
+		"fmt": "prettier --check .",
+		"fmt:fix": "prettier --write .",
+		"lint": "eslint **/*.*ts*",
+		"lint:fix": "npm run lint -- --fix",
+		"build:types:cf": "wrangler types",
+		"postbuild:types:cf": "prettier --write worker-configuration.d.ts",
+		"start": "wrangler dev"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/demosjarco/cloudflare-dns-updater.git"
+	},
+	"author": "demosjarco",
+	"license": "UNLICENSED",
+	"private": true,
+	"bugs": {
+		"url": "https://github.com/demosjarco/cloudflare-dns-updater/issues"
+	},
+	"homepage": "https://github.com/demosjarco/cloudflare-dns-updater#readme",
+	"prettier": "@demosjarco/prettier-config",
+	"dependencies": {
+		"cloudflare": "^5.2.0",
+		"zod": "^4.1.13"
+	},
+	"devDependencies": {
+		"@demosjarco/prettier-config": "^1.0.2",
+		"@eslint/js": "^9.39.1",
+		"@microsoft/eslint-formatter-sarif": "^3.1.0",
+		"@types/node": "^24.10.2",
+		"eslint": "^9.39.1",
+		"prettier": "^3.7.4",
+		"typescript": "^5.9.3",
+		"typescript-eslint": "^8.49.0",
+		"wrangler": "^4.53.0"
+	}
+}

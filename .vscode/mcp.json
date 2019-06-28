@@ -1,0 +1,8 @@
+{
+	"servers": {
+		"cloudflare-documentation": {
+			"type": "sse",
+			"url": "https://docs.mcp.cloudflare.com/sse"
+		}
+	}
+}

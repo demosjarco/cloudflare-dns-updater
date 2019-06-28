@@ -1,0 +1,17 @@
+[Unit]
+Description=Daily DNS Refresh
+After=network-online.target
+
+[Service]
+Environment=JOBS=max
+Environment=NODE_ENV=production
+WorkingDirectory=/cloudflare-dns-updater
+ExecStartPre=/usr/bin/git pull
+ExecStartPre=/usr/bin/npm ci --omit=dev --audit=false --fund=false
+ExecStart=/usr/bin/node index.js
+User=root
+Group=root
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target
