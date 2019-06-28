@@ -1,0 +1,85 @@
+name: Prettier
+
+on:
+  push:
+    paths:
+      - '**.*js*'
+      - '**.*ts*'
+      - '**.css'
+      - '**.less'
+      - '**.scss'
+      - '**.html'
+      - '**.hbs'
+      - '**.json'
+      - '**.gql'
+      - '**.graphql'
+      - '**.md*'
+      - '**.yaml'
+      - '**.yml'
+  pull_request_target:
+    paths:
+      - '**.*js*'
+      - '**.*ts*'
+      - '**.css'
+      - '**.less'
+      - '**.scss'
+      - '**.html'
+      - '**.hbs'
+      - '**.json'
+      - '**.gql'
+      - '**.graphql'
+      - '**.md*'
+      - '**.yaml'
+      - '**.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prettier:
+    runs-on: ubuntu-latest
+    if: github.actor != 'demosjarco-prettier[bot]'
+    permissions:
+      contents: write
+    steps:
+      - uses: step-security/harden-runner@95d9a5deda9de15063e7595e9719c11c38c90ae2 # v2.13.2
+        with:
+          disable-sudo-and-containers: true
+          egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
+      - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        id: gh_prettier_token
+        with:
+          app-id: ${{ vars.GH_PRETTIER_CLIENT_ID }}
+          private-key: ${{ secrets.GH_PRETTIER_PRIVATE_KEY }}
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          token: ${{ steps.gh_prettier_token.outputs.token }}
+      - name: Git Setup
+        run: |
+          git config user.name "${{ steps.gh_prettier_token.outputs.app-slug }}[bot]"
+          git config user.email "${{ vars.GH_PRETTIER_USER_ID }}+${{ steps.gh_prettier_token.outputs.app-slug }}[bot]@users.noreply.github.com"
+      - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+        with:
+          node-version: lts/*
+          check-latest: true
+          cache: 'npm'
+      - run: npm ci --ignore-scripts
+      - run: npm run-script install --if-present
+      - run: npm run fmt:fix
+      - name: Check for Changes
+        id: changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "changes=false" >> $GITHUB_OUTPUT
+          fi
+      - run: git commit -am "Ran formatter" || echo "No formatting done"
+        if: steps.changes.outputs.changes == 'true'
+      - run: git push
+        if: steps.changes.outputs.changes == 'true'
