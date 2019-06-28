@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily DNS Refresh
+
+[Timer]
+OnCalendar=*-*-* 00:00:00
+AccuracySec=1min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
