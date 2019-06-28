@@ -17,9 +17,6 @@
 		"url": "https://github.com/demosjarco/cloudflare-dns-updater/issues"
 	},
 	"homepage": "https://github.com/demosjarco/cloudflare-dns-updater#readme",
-	"devDependencies": {
-		"nodemon": "^1.19.1"
-	},
 	"dependencies": {
 		"dotenv": "^8.0.0",
 		"request": "^2.88.0"
