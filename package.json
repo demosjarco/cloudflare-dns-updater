@@ -1,4 +1,4 @@
-{	
+{
 	"name": "cloudflare-dns-updater",
 	"version": "1.0.0",
 	"description": "",
@@ -16,5 +16,11 @@
 	"bugs": {
 		"url": "https://github.com/demosjarco/cloudflare-dns-updater/issues"
 	},
-	"homepage": "https://github.com/demosjarco/cloudflare-dns-updater#readme"
+	"homepage": "https://github.com/demosjarco/cloudflare-dns-updater#readme",
+	"devDependencies": {
+		"nodemon": "^1.19.1"
+	},
+	"dependencies": {
+		"request": "^2.88.0"
+	}
 }
