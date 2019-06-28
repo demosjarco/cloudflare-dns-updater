@@ -1,0 +1,52 @@
+{
+	// Visit https://aka.ms/tsconfig to read more about this file
+	"compilerOptions": {
+		// File Layout
+		// "rootDir": "./src",
+		// "outDir": "./dist",
+
+		// Environment Settings
+		// See also https://aka.ms/tsconfig/module
+		"module": "esnext",
+		"moduleResolution": "bundler",
+		"target": "esnext",
+		"lib": ["ESNext"],
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"allowSyntheticDefaultImports": true,
+		"forceConsistentCasingInFileNames": true,
+
+		// Other Outputs
+		"sourceMap": true,
+		// "declaration": true,
+		// "declarationMap": true,
+		"allowJs": true,
+		"checkJs": false,
+		"removeComments": true,
+		"noEmit": true,
+
+		// Stricter Typechecking Options
+		"strict": true,
+		"alwaysStrict": true,
+		"noImplicitAny": true,
+		"strictNullChecks": true,
+		"strictFunctionTypes": true,
+		"strictBindCallApply": true,
+		"strictPropertyInitialization": true,
+		"noImplicitThis": true,
+		"noImplicitOverride": true,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUncheckedIndexedAccess": true,
+		"noPropertyAccessFromIndexSignature": true,
+		"exactOptionalPropertyTypes": true,
+		"noUncheckedSideEffectImports": true,
+
+		"skipLibCheck": true,
+
+		"paths": {
+			"~/*": ["./src/*"]
+		},
+		"types": ["./worker-configuration.d.ts", "node"]
+	}
+}

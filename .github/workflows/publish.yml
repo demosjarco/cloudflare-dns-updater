@@ -1,0 +1,61 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/publish.yml'
+      - 'src/**'
+      - 'package*.json'
+      - 'tsconfig.json'
+      - 'wrangler.json*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.environment || github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: step-security/harden-runner@95d9a5deda9de15063e7595e9719c11c38c90ae2 # v2.13.2
+        with:
+          disable-sudo-and-containers: true
+          egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+        with:
+          node-version: lts/*
+          check-latest: true
+          cache: 'npm'
+      - run: npm ci --ignore-scripts
+      - run: npm run-script install --if-present
+      - run: npm run build:types:cf
+      - run: git commit -m "Generate cf types" worker-configuration.d.ts || echo "No type generation done"
+      - run: git push
+        continue-on-error: false
+      - run: echo "wrangler_version=$(npm ls wrangler --depth=0 --json | jq -r '.dependencies.wrangler.version')" >> $GITHUB_OUTPUT
+        id: npm_wrangler_version
+      - uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65 # v3.14.1
+        id: wrangler
+        with:
+          wranglerVersion: ${{ steps.npm_wrangler_version.outputs.wrangler_version }}
+          apiToken: ${{ secrets.WORKER_DEPLOY_CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          vars: |
+            CF_ACCOUNT_ID
+            CONFIG
+            GIT_HASH
+          secrets: |
+            CF_API_TOKEN
+        env:
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CONFIG: ${{ secrets.CONFIG }}
+          GIT_HASH: ${{ github.sha }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
