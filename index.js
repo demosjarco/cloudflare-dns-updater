@@ -20,8 +20,10 @@ request({
 		const json = JSON.parse(body);
 		if (json.success) {
 			json.result.forEach(function (dnsRecord) {
-				if (dnsRecord.type == 'A' || dnsRecord.type == 'AAAA') {
-					updateCloudflare(dnsRecord);
+				if (dnsRecord.name == process.env.CLOUDFLARE_UPDATEFOR) {
+					if (dnsRecord.type == 'A' || dnsRecord.type == 'AAAA') {
+						updateCloudflare(dnsRecord);
+					}
 				}
 			});
 		}
