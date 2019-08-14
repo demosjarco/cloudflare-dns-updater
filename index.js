@@ -7,7 +7,7 @@ request({
 	method: 'GET',
 	url: 'https://api.cloudflare.com/client/v4/zones/' + process.env.CLOUDFLARE_ZONEIDENTIFIER + '/dns_records',
 	headers: {
-		Authorization: 'Bearer ' + process.env.CLOUDFLARE_APIKEY
+		Authorization: 'Bearer ' + process.env.CLOUDFLARE_APIKEY,
 		per_page: '100'
 	}
 }, function (error, response, body) {
