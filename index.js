@@ -57,8 +57,8 @@ function updateCloudflare(dnsRecord) {
 							type: dnsRecord.type,
 							name: dnsRecord.name,
 							content: currentIp,
-							ttl: 1,
-							proxied: true
+							ttl: dnsRecord.ttl,
+							proxied: dnsRecord.proxied
 						},
 						json: true
 					}, function (error2, response2, body2) {
