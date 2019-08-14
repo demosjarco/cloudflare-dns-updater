@@ -7,8 +7,7 @@ request({
 	method: 'GET',
 	url: 'https://api.cloudflare.com/client/v4/zones/' + process.env.CLOUDFLARE_ZONEIDENTIFIER + '/dns_records',
 	headers: {
-		'X-Auth-Email': process.env.CLOUDFLARE_EMAIL,
-		'X-Auth-Key': process.env.CLOUDFLARE_APIKEY,
+		Authorization: 'Bearer ' + process.env.CLOUDFLARE_APIKEY
 		per_page: '100'
 	}
 }, function (error, response, body) {
@@ -52,8 +51,7 @@ function updateCloudflare(dnsRecord) {
 						url: 'https://api.cloudflare.com/client/v4/zones/' + process.env.CLOUDFLARE_ZONEIDENTIFIER + '/dns_records/' + dnsRecord.id,
 						headers: {
 							'Content-Type': 'application/json',
-							'X-Auth-Email': process.env.CLOUDFLARE_EMAIL,
-							'X-Auth-Key': process.env.CLOUDFLARE_APIKEY,
+							Authorization: 'Bearer ' + process.env.CLOUDFLARE_APIKEY
 						},
 						body: {
 							type: dnsRecord.type,
