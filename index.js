@@ -54,6 +54,7 @@ function updateCloudflare(dnsRecord) {
 					if (validIp.test(body1.ip)) {
 						const currentIp = validIp.exec(body1.ip)[0];
 						console.log(currentIp);
+						console.log(dnsRecord.type);
 						request.put({
 							url: 'https://api.cloudflare.com/client/v4/zones/' + process.env.CLOUDFLARE_ZONEIDENTIFIER + '/dns_records/' + dnsRecord.id,
 							headers: {
