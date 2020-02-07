@@ -69,7 +69,6 @@ function updateCloudflare(dnsRecord) {
 							if (error2) {
 								throw error2
 							} else if (response2.statusCode != 200) {
-								console.log(response2);
 								throw new Error('setting ip address http ' + response2.statusCode);
 							}
 						});
