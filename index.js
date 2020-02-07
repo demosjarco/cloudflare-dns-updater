@@ -59,11 +59,11 @@ function updateCloudflare(dnsRecord) {
 								Authorization: 'Bearer ' + process.env.CLOUDFLARE_APIKEY
 							},
 							body: {
-								type: dnsRecord.type,
-								name: dnsRecord.name,
-								content: currentIp,
-								ttl: dnsRecord.ttl,
-								proxied: dnsRecord.proxied
+								"type": dnsRecord.type,
+								"name": dnsRecord.name,
+								"content": currentIp,
+								"ttl": dnsRecord.ttl,
+								"proxied": dnsRecord.proxied
 							},
 							json: true
 						}, function (error2, response2, body2) {
