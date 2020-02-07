@@ -38,6 +38,7 @@ function updateCloudflare(dnsRecord) {
 		} else if (dnsRecord.type == 'AAAA') {
 			getIpUrl = 'https://api6.ipify.org/?format=json';
 		}
+		console.log(getIpUrl);
 		if (getIpUrl != '') {
 			request.get({
 				url: getIpUrl,
