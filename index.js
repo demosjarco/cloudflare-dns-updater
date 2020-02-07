@@ -31,6 +31,7 @@ request({
 
 function updateCloudflare(dnsRecord) {
 	if (dnsRecord) {
+		console.log(dnsRecord.type);
 		let getIpUrl = '';
 		if (dnsRecord.type == 'A') {
 			getIpUrl = 'https://api.ipify.org/?format=json';
