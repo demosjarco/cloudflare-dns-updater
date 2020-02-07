@@ -9,16 +9,16 @@ request({
 	headers: {
 		Authorization: 'Bearer ' + process.env.CLOUDFLARE_APIKEY,
 		per_page: '100'
-	}
+	},
+	json: true
 }, function (error, response, body) {
 	if (error) {
 		throw error;
 	} else if (response.statusCode != 200) {
 		throw new Error('cloudflare get dns records http ' + response.statusCode);
 	} else {
-		const json = JSON.parse(body);
-		if (json.success) {
-			json.result.forEach(function (dnsRecord) {
+		if (body.success) {
+			body.result.forEach(function (dnsRecord) {
 				if (dnsRecord.name == process.env.CLOUDFLARE_UPDATEFOR) {
 					if (dnsRecord.type == 'A' || dnsRecord.type == 'AAAA') {
 						updateCloudflare(dnsRecord);
