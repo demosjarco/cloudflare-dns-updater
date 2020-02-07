@@ -62,6 +62,7 @@ function updateCloudflare(dnsRecord) {
 						request.put({
 							url: 'https://api.cloudflare.com/client/v4/zones/' + process.env.CLOUDFLARE_ZONEIDENTIFIER + '/dns_records/' + dnsRecord.id,
 							headers: {
+								'Content-Type': 'application/json',
 								Authorization: 'Bearer ' + process.env.CLOUDFLARE_APIKEY
 							},
 							body: JSON.stringify({
