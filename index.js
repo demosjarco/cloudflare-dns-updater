@@ -17,6 +17,7 @@ request({
 	} else if (response.statusCode != 200) {
 		throw new Error('cloudflare get dns records http ' + response.statusCode);
 	} else {
+		console.log(body);
 		if (body.success) {
 			body.result.forEach(function (dnsRecord) {
 				if (dnsRecord.name == process.env.CLOUDFLARE_UPDATEFOR) {
