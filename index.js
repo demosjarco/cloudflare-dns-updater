@@ -65,13 +65,13 @@ function updateCloudflare(dnsRecord) {
 								'Content-Type': 'application/json',
 								Authorization: 'Bearer ' + process.env.CLOUDFLARE_APIKEY
 							},
-							body: {
+							body: JSON.stringify({
 								"type": dnsRecord.type,
 								"name": dnsRecord.name,
 								"content": currentIp,
 								"ttl": dnsRecord.ttl,
 								"proxied": dnsRecord.proxied
-							},
+							}),
 							json: true
 						}, function (error2, response2, body2) {
 							if (error2) {
