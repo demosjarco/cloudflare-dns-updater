@@ -19,6 +19,6 @@
 	"homepage": "https://github.com/demosjarco/cloudflare-dns-updater#readme",
 	"dependencies": {
 		"dotenv": "^8.2.0",
-		"request": "^2.88.0"
+		"request": "^2.88.2"
 	}
 }
