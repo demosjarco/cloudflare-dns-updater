@@ -10,7 +10,7 @@
 		"type": "git",
 		"url": "git+https://github.com/demosjarco/cloudflare-dns-updater.git"
 	},
-	"author": "",
+	"author": "demosjarco",
 	"license": "UNLICENSED",
 	"private": true,
 	"bugs": {
