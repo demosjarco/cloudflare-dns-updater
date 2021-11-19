@@ -1,4 +1,4 @@
-name: Update Cront
+name: Update NPM Packages
 
 on:
   schedule:
