@@ -25,7 +25,7 @@ jobs:
         run: |
           git config user.name "NPM Updater"
           git config user.email "<>"
-      - name: Push updated back to repo
-        run: |
-          git commit -m "Updated packages"
-          git push
+      - name: Commit changes
+        run: git commit -m "Updated packages"
+      - name: Push back to repo
+        run: git push
