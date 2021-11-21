@@ -24,7 +24,12 @@ jobs:
         run: |
           git config user.name "NPM Updater"
           git config user.email "<>"
+      - name: Add changes
+        run: git add -A
+      - name: Check git diff
+        run: git diff-index --quiet HEAD
       - name: Commit changes
-        run: git commit -am "Updated packages"
-      - name: Push back to repo
-        run: git push
+        if: ${{ success() }}
+        run: |
+          git commit -m "Updated packages"
+          git push
