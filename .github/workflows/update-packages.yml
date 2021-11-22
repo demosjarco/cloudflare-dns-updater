@@ -29,7 +29,7 @@ jobs:
       - name: Check git diff
         run: git diff-index --quiet HEAD
       - name: Commit changes
-        if: ${{ success() }}
+        if: ${{ failure() }}
         run: |
           git commit -m "Updated packages"
           git push
