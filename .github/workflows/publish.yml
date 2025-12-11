@@ -1,0 +1,137 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/publish.yml'
+      - 'src/**'
+      - 'package*.json'
+      - 'tsconfig.json'
+      - 'wrangler.json*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.environment || github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment || github.ref_name }}
+      url: https://${{ (inputs.environment || vars.ENVIRONMENT) != 'production' && format('{0}.', (inputs.environment || vars.ENVIRONMENT)) || '' }}dns.demosjarco.dev
+    steps:
+      - uses: step-security/harden-runner@95d9a5deda9de15063e7595e9719c11c38c90ae2 # v2.13.2
+        with:
+          disable-sudo-and-containers: true
+          egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+        with:
+          node-version: lts/*
+          check-latest: true
+          cache: 'npm'
+      - run: npm ci --ignore-scripts
+      - run: npm run-script install --if-present
+      - run: npm run build:types:cf
+      - run: git commit -m "Generate cf types" worker-configuration.d.ts || echo "No type generation done"
+      - run: git push
+        continue-on-error: false
+      - run: echo "wrangler_version=$(npm ls wrangler --depth=0 --json | jq -r '.dependencies.wrangler.version')" >> $GITHUB_OUTPUT
+        id: npm_wrangler_version
+      - uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65 # v3.14.1
+        id: wrangler
+        with:
+          wranglerVersion: ${{ steps.npm_wrangler_version.outputs.wrangler_version }}
+          apiToken: ${{ secrets.WORKER_DEPLOY_CF_API_TOKEN }}
+          accountId: ${{ vars.CF_ACCOUNT_ID }}
+          environment: ${{ vars.ENVIRONMENT != 'preview' && vars.ENVIRONMENT || '' }}
+          vars: |
+            CF_ACCOUNT_ID
+            GIT_HASH
+            OPENAI_ORGANIZATION
+          secrets: |
+            ANTHROPIC_API_KEY
+            AZURE_API_KEY_OPENAI_AE_DUBAI
+            AZURE_API_KEY_OPENAI_AU_NEWSOUTHWALES
+            AZURE_API_KEY_OPENAI_BR_SAOPAULOSTATE
+            AZURE_API_KEY_OPENAI_CA_QUEBEC
+            AZURE_API_KEY_OPENAI_CA_TORONTO
+            AZURE_API_KEY_OPENAI_CH_GENEVA
+            AZURE_API_KEY_OPENAI_CH_ZURICH
+            AZURE_API_KEY_OPENAI_EU_FRANKFURT
+            AZURE_API_KEY_OPENAI_EU_GAVLE
+            AZURE_API_KEY_OPENAI_EU_MADRID
+            AZURE_API_KEY_OPENAI_EU_MILAN
+            AZURE_API_KEY_OPENAI_EU_NETHERLANDS
+            AZURE_API_KEY_OPENAI_EU_PARIS
+            AZURE_API_KEY_OPENAI_EU_WARSAW
+            AZURE_API_KEY_OPENAI_IN_CHENNAI
+            AZURE_API_KEY_OPENAI_JP_TOKYO
+            AZURE_API_KEY_OPENAI_KR_SEOUL
+            AZURE_API_KEY_OPENAI_NO_OSLO
+            AZURE_API_KEY_OPENAI_SG_SINGAPORE
+            AZURE_API_KEY_OPENAI_UK_LONDON
+            AZURE_API_KEY_OPENAI_US_CALIFORNIA
+            AZURE_API_KEY_OPENAI_US_ILLINOIS
+            AZURE_API_KEY_OPENAI_US_IOWA
+            AZURE_API_KEY_OPENAI_US_PHOENIX
+            AZURE_API_KEY_OPENAI_US_TEXAS
+            AZURE_API_KEY_OPENAI_US_VIRGINIA
+            AZURE_API_KEY_OPENAI_US_VIRGINIA2
+            AZURE_API_KEY_OPENAI_ZA_JOHANNESBURG
+            CF_API_TOKEN
+            DISCORD_TOKEN
+            GOOGLE_AI_API_KEY
+            IFTTT_BEARER
+            GOOGLE_DLP_API_KEY
+            OPENAI_API_KEY
+            SENDGRID_KEY
+            STATUSPAGE_API_KEY
+            WEXTRACTOR_AUTH_TOKEN
+        env:
+          CF_ACCOUNT_ID: ${{ vars.CF_ACCOUNT_ID }}
+          GIT_HASH: ${{ github.sha }}
+          OPENAI_ORGANIZATION: ${{ vars.OPENAI_ORGANIZATION }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          AZURE_API_KEY_OPENAI_AE_DUBAI: ${{ secrets.AZURE_API_KEY_OPENAI_AE_DUBAI }}
+          AZURE_API_KEY_OPENAI_AU_NEWSOUTHWALES: ${{ secrets.AZURE_API_KEY_OPENAI_AU_NEWSOUTHWALES }}
+          AZURE_API_KEY_OPENAI_BR_SAOPAULOSTATE: ${{ secrets.AZURE_API_KEY_OPENAI_BR_SAOPAULOSTATE }}
+          AZURE_API_KEY_OPENAI_CA_QUEBEC: ${{ secrets.AZURE_API_KEY_OPENAI_CA_QUEBEC }}
+          AZURE_API_KEY_OPENAI_CA_TORONTO: ${{ secrets.AZURE_API_KEY_OPENAI_CA_TORONTO }}
+          AZURE_API_KEY_OPENAI_CH_GENEVA: ${{ secrets.AZURE_API_KEY_OPENAI_CH_GENEVA }}
+          AZURE_API_KEY_OPENAI_CH_ZURICH: ${{ secrets.AZURE_API_KEY_OPENAI_CH_ZURICH }}
+          AZURE_API_KEY_OPENAI_EU_FRANKFURT: ${{ secrets.AZURE_API_KEY_OPENAI_EU_FRANKFURT }}
+          AZURE_API_KEY_OPENAI_EU_GAVLE: ${{ secrets.AZURE_API_KEY_OPENAI_EU_GAVLE }}
+          AZURE_API_KEY_OPENAI_EU_MADRID: ${{ secrets.AZURE_API_KEY_OPENAI_EU_MADRID }}
+          AZURE_API_KEY_OPENAI_EU_MILAN: ${{ secrets.AZURE_API_KEY_OPENAI_EU_MILAN }}
+          AZURE_API_KEY_OPENAI_EU_NETHERLANDS: ${{ secrets.AZURE_API_KEY_OPENAI_EU_NETHERLANDS }}
+          AZURE_API_KEY_OPENAI_EU_PARIS: ${{ secrets.AZURE_API_KEY_OPENAI_EU_PARIS }}
+          AZURE_API_KEY_OPENAI_EU_WARSAW: ${{ secrets.AZURE_API_KEY_OPENAI_EU_WARSAW }}
+          AZURE_API_KEY_OPENAI_IN_CHENNAI: ${{ secrets.AZURE_API_KEY_OPENAI_IN_CHENNAI }}
+          AZURE_API_KEY_OPENAI_JP_TOKYO: ${{ secrets.AZURE_API_KEY_OPENAI_JP_TOKYO }}
+          AZURE_API_KEY_OPENAI_KR_SEOUL: ${{ secrets.AZURE_API_KEY_OPENAI_KR_SEOUL }}
+          AZURE_API_KEY_OPENAI_NO_OSLO: ${{ secrets.AZURE_API_KEY_OPENAI_NO_OSLO }}
+          AZURE_API_KEY_OPENAI_SG_SINGAPORE: ${{ secrets.AZURE_API_KEY_OPENAI_SG_SINGAPORE }}
+          AZURE_API_KEY_OPENAI_UK_LONDON: ${{ secrets.AZURE_API_KEY_OPENAI_UK_LONDON }}
+          AZURE_API_KEY_OPENAI_US_CALIFORNIA: ${{ secrets.AZURE_API_KEY_OPENAI_US_CALIFORNIA }}
+          AZURE_API_KEY_OPENAI_US_ILLINOIS: ${{ secrets.AZURE_API_KEY_OPENAI_US_ILLINOIS }}
+          AZURE_API_KEY_OPENAI_US_IOWA: ${{ secrets.AZURE_API_KEY_OPENAI_US_IOWA }}
+          AZURE_API_KEY_OPENAI_US_PHOENIX: ${{ secrets.AZURE_API_KEY_OPENAI_US_PHOENIX }}
+          AZURE_API_KEY_OPENAI_US_TEXAS: ${{ secrets.AZURE_API_KEY_OPENAI_US_TEXAS }}
+          AZURE_API_KEY_OPENAI_US_VIRGINIA: ${{ secrets.AZURE_API_KEY_OPENAI_US_VIRGINIA }}
+          AZURE_API_KEY_OPENAI_US_VIRGINIA2: ${{ secrets.AZURE_API_KEY_OPENAI_US_VIRGINIA2 }}
+          AZURE_API_KEY_OPENAI_ZA_JOHANNESBURG: ${{ secrets.AZURE_API_KEY_OPENAI_ZA_JOHANNESBURG }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          GOOGLE_AI_API_KEY: ${{ secrets.GOOGLE_AI_API_KEY }}
+          IFTTT_BEARER: ${{ secrets.IFTTT_BEARER }}
+          GOOGLE_DLP_API_KEY: ${{ secrets.GOOGLE_DLP_API_KEY }}
+          SENDGRID_KEY: ${{ secrets.SENDGRID_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          STATUSPAGE_API_KEY: ${{ secrets.STATUSPAGE_API_KEY }}
+          WEXTRACTOR_AUTH_TOKEN: ${{ secrets.WEXTRACTOR_AUTH_TOKEN }}
