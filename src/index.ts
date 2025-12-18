@@ -106,28 +106,29 @@ export default <ExportedHandler<EnvVars>>{
 							);
 							console.debug('temp', temp);
 
-							spectrumAppsByZone = await temp.reduce(
-								async (recordPromise, [zone_id, recordNames]) => {
-									console.debug({ recordPromise, zone_id, recordNames: Array.from(recordNames) });
+							spectrumAppsByZone = Object.fromEntries(
+								await Promise.all(
+									temp.map(async ([zone_id, recordNames]) => {
+										console.debug({ zone_id, recordNames: Array.from(recordNames) });
 
-									const record = await recordPromise;
-									record[zone_id] = (
-										await Array.fromAsync(
-											cf.spectrum.apps.list({
-												zone_id,
-												/**
-												 * @link https://developers.cloudflare.com/api/resources/spectrum/subresources/apps/methods/list/
-												 */
-												per_page: 100,
-											}),
+										const appsForZone = (
+											await Array.fromAsync(
+												cf.spectrum.apps.list({
+													zone_id,
+													/**
+													 * @link https://developers.cloudflare.com/api/resources/spectrum/subresources/apps/methods/list/
+													 */
+													per_page: 100,
+												}),
+											)
 										)
-									)
-										.flat()
-										.filter((spectrum_app) => typeof spectrum_app.dns.name === 'string')
-										.filter((spectrum_app) => recordNames.has(spectrum_app.dns.name!));
-									return record;
-								},
-								Promise.resolve({} as Record<string, AppListResponse>),
+											.flat()
+											.filter((spectrum_app) => typeof spectrum_app.dns.name === 'string')
+											.filter((spectrum_app) => recordNames.has(spectrum_app.dns.name!));
+
+										return [zone_id, appsForZone] as const;
+									}),
+								),
 							);
 						}
 
