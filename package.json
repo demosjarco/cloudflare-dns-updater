@@ -24,7 +24,7 @@
 	"dependencies": {
 		"cloudflare": "^5.2.0",
 		"mimetext": "^3.0.27",
-		"zod": "^4.2.1"
+		"zod": "^4.3.4"
 	},
 	"devDependencies": {
 		"@demosjarco/prettier-config": "^1.0.2",
